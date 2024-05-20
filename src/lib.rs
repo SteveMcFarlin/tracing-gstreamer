@@ -15,16 +15,11 @@
 // such as https://gitlab.freedesktop.org/gstreamer/gstreamer-rs/-/issues/352
 #![deny(unsafe_op_in_unsafe_fn)]
 
-pub use log::attach_span;
 use tracing_core::field::Value;
 
 #[macro_use]
 mod macros;
 mod callsite;
-#[cfg(feature = "tracing-chrome")]
-mod chrometracer;
-
-mod fmttracer;
 mod log;
 mod tracer;
 
@@ -143,20 +138,7 @@ pub fn register(p: Option<&gstreamer::Plugin>) -> Result<(), gstreamer::glib::Bo
     gstreamer::Tracer::register(
         p,
         "rusttracing",
-        <tracer::TracingTracer as gstreamer::glib::types::StaticType>::static_type(),
-    )?;
-
-    #[cfg(feature = "tracing-chrome")]
-    gstreamer::Tracer::register(
-        p,
-        "chrometracing",
-        <chrometracer::ChromeTracer as gstreamer::glib::types::StaticType>::static_type(),
-    )?;
-
-    gstreamer::Tracer::register(
-        p,
-        "fmttracing",
-        <fmttracer::FmtTracer as gstreamer::glib::types::StaticType>::static_type(),
+        <tracer::TracingTracer as gstreamer::glib::StaticType>::static_type(),
     )?;
     Ok(())
 }
